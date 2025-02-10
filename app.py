@@ -1,25 +1,17 @@
 from flask import Flask
 from config import Config
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_login import LoginManager
-
-# Initialize extensions
-db = SQLAlchemy()
-migrate = Migrate()
-login_manager = LoginManager()
-login_manager.login_view = 'auth.login'
+from extensions import db, migrate, login_manager  # Import from extensions
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Initialize extensions with app
+    # Initialize extensions with the app
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
 
-    # Register blueprints for authentication, overtime, and stock management
+    # Register blueprints
     from routes.auth import auth_bp
     from routes.overtime import overtime_bp
     from routes.stock import stock_bp
@@ -28,7 +20,7 @@ def create_app():
     app.register_blueprint(overtime_bp)
     app.register_blueprint(stock_bp)
 
-    # A simple index route
+    # Simple index route
     @app.route('/')
     def index():
         return """
