@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Submit Overtime Request</h2>
+<form method="POST" action="{{ url_for('overtime.submit_overtime') }}">
+  <div class="form-group">
+    <label for="ticket_number">Ticket Number</label>
+    <input type="text" class="form-control" id="ticket_number" name="ticket_number" required>
+  </div>
+  <div class="form-group">
+    <label for="time_logged">Time Logged</label>
+    <input type="time" class="form-control" id="time_logged" name="time_logged" required>
+  </div>
+  <div class="form-group">
+    <label for="client_name">Client Name</label>
+    <input type="text" class="form-control" id="client_name" name="client_name" required>
+  </div>
+  <div class="form-group">
+    <label for="manager_name">Manager Name</label>
+    <input type="text" class="form-control" id="manager_name" name="manager_name" required>
+  </div>
+  <div class="form-group">
+    <label for="date">Date</label>
+    <input type="date" class="form-control" id="date" name="date" required>
+  </div>
+  <button type="submit" class="btn btn-success">Submit Request</button>
+</form>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Update Hardware Status</h2>
+<p><strong>Barcode:</strong> {{ barcode }}</p>
+<form method="POST">
+  <div class="form-group">
+    <label for="hardware_status">Select Status</label>
+    <select class="form-control" id="hardware_status" name="hardware_status" required>
+      <option value="In Storage">In Storage</option>
+      <option value="Deployed">Deployed</option>
+      <option value="In Transport">In Transport</option>
+    </select>
+  </div>
+  <button type="submit" class="btn btn-success">Update Status</button>
+</form>
+{% endblock %}
