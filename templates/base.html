@@ -2,38 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Overtime and Stock Management Portal</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}My Application{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='loading/loading.css') }}">
+  <style>
+    /* Additional global futuristic styling */
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #ffffff;
+    }
+  </style>
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/">Portal</a>
-    <div class="collapse navbar-collapse">
-      <ul class="navbar-nav mr-auto">
-        {% if current_user.is_authenticated %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('overtime.overtime_form') }}">Overtime</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('stock.stock_home') }}">Stock</a></li>
-          {% if current_user.is_admin %}
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('overtime.overtime_report') }}">Reports</a></li>
-          {% endif %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
-        {% else %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
-        {% endif %}
-      </ul>
-    </div>
-  </nav>
-  <div class="container mt-4">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-    {% block content %}{% endblock %}
+  <div id="loader" class="loader"></div>
+  <script src="{{ url_for('static', filename='loading/loading.js') }}"></script>
+  <div id="content" style="display:none;">
+    {% block content %}
+    {% endblock %}
   </div>
+  <script>
+    window.addEventListener('load', function() {
+      const content = document.getElementById('content');
+      content.style.display = 'block';
+    });
+  </script>
 </body>
 </html>

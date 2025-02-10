@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div style="text-align: center; padding: 50px;">
+  <h1 style="font-size: 3em; margin-bottom: 20px;">Welcome to the Future</h1>
+  <p style="font-size: 1.5em; margin-bottom: 30px;">
+    Enjoy the advanced Overtime and Stock Management Portal built for tomorrow's needs.
+  </p>
+  <a href="/login" style="
+      padding: 15px 30px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 1.2em;
+      transition: background 0.3s ease;
+    " onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+    Login
+  </a>
+</div>
+{% endblock %}

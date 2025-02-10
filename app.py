@@ -1,6 +1,6 @@
-from flask import Flask
+from flask import Flask, render_template
 from config import Config
-from extensions import db, migrate, login_manager  # Import from extensions
+from extensions import db, migrate, login_manager
 
 def create_app():
     app = Flask(__name__)
@@ -13,20 +13,17 @@ def create_app():
 
     # Register blueprints
     from routes.auth import auth_bp
-    from routes.overtime import overtime_blueprint  # Updated import
+    from routes.overtime import overtime_blueprint
     from routes.stock import stock_bp
 
     app.register_blueprint(auth_bp)
-    app.register_blueprint(overtime_blueprint)  # Use the renamed blueprint
+    app.register_blueprint(overtime_blueprint)
     app.register_blueprint(stock_bp)
 
-    # Simple index route
+    # Load the futuristic index page
     @app.route('/')
     def index():
-        return """
-        <h1>Welcome to the Overtime and Stock Management Portal</h1>
-        <p><a href='/login'>Login</a></p>
-        """
+        return render_template('index.html')
 
     return app
 
