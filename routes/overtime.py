@@ -1,21 +1,70 @@
+from flask import Blueprint, request, render_template, redirect, url_for, flash
+from flask_login import login_required, current_user
+from models.overtime import OvertimeRequest
 from extensions import db
 from datetime import datetime
 
-class OvertimeRequest(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    ticket_number = db.Column(db.String(50), nullable=False)
-    time_logged = db.Column(db.String(20), nullable=False)  # Stored as a string for simplicity
-    client_name = db.Column(db.String(100), nullable=False)
-    manager_name = db.Column(db.String(100), nullable=False)
-    date = db.Column(db.Date, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+# Rename blueprint to avoid potential conflicts
+overtime_blueprint = Blueprint('overtime', __name__)
 
-    def to_dict(self):
-        return {
-            "ticket_number": self.ticket_number,
-            "time_logged": self.time_logged,
-            "client_name": self.client_name,
-            "manager_name": self.manager_name,
-            "date": self.date.isoformat(),
-            "created_at": self.created_at.isoformat()
-        }
+@overtime_blueprint.route('/overtime', methods=['GET'])
+@login_required
+def overtime_form():
+    return render_template('overtime.html')
+
+@overtime_blueprint.route('/api/overtime/submit', methods=['POST'])
+@login_required
+def submit_overtime():
+    ticket_number = request.form.get('ticket_number')
+    time_logged = request.form.get('time_logged')
+    client_name = request.form.get('client_name')
+    manager_name = request.form.get('manager_name')
+    date_str = request.form.get('date')
+
+    # Validate date format
+    try:
+        date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        flash('Invalid date format', 'danger')
+        return redirect(url_for('overtime.overtime_form'))
+
+    new_request = OvertimeRequest(
+        ticket_number=ticket_number,
+        time_logged=time_logged,
+        client_name=client_name,
+        manager_name=manager_name,
+        date=date
+    )
+    db.session.add(new_request)
+    db.session.commit()
+    flash('Overtime request submitted successfully', 'success')
+    return redirect(url_for('overtime.overtime_form'))
+
+@overtime_blueprint.route('/overtime/report', methods=['GET'])
+@login_required
+def overtime_report():
+    if not current_user.is_admin:
+        flash('Access denied', 'danger')
+        return redirect(url_for('overtime.overtime_form'))
+
+    # Get filter parameters from the query string
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    manager_name = request.args.get('manager_name')
+    client_name = request.args.get('client_name')
+
+    query = OvertimeRequest.query
+    if start_date and end_date:
+        try:
+            sd = datetime.strptime(start_date, '%Y-%m-%d').date()
+            ed = datetime.strptime(end_date, '%Y-%m-%d').date()
+            query = query.filter(OvertimeRequest.date.between(sd, ed))
+        except ValueError:
+            flash('Invalid date format for filtering', 'danger')
+    if manager_name:
+        query = query.filter(OvertimeRequest.manager_name.ilike(f"%{manager_name}%"))
+    if client_name:
+        query = query.filter(OvertimeRequest.client_name.ilike(f"%{client_name}%"))
+
+    overtime_requests = query.all()
+    return render_template('overtime_report.html', requests=overtime_requests)

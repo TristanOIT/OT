@@ -13,11 +13,11 @@ def create_app():
 
     # Register blueprints
     from routes.auth import auth_bp
-    from routes.overtime import overtime_bp
+    from routes.overtime import overtime_blueprint  # Updated import
     from routes.stock import stock_bp
 
     app.register_blueprint(auth_bp)
-    app.register_blueprint(overtime_bp)
+    app.register_blueprint(overtime_blueprint)  # Use the renamed blueprint
     app.register_blueprint(stock_bp)
 
     # Simple index route

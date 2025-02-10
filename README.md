@@ -10,11 +10,10 @@ This is a professional, advanced, and lightweight web portal built with Python F
 
 ## Setup Instructions
 
-1. **Clone the repository** and navigate to the project directory.
+### 1. Clone the Repository
 
-2. **Create a virtual environment** and install the dependencies:
+Clone the repository to your local machine and navigate to the project directory:
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
+```cmd
+git clone <repository_url>
+cd overtime_stock_portal
