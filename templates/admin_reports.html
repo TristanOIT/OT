@@ -2,13 +2,21 @@
 
 {% block head %}
 <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
     body {
         background: linear-gradient(135deg, #50c878, #4a90e2);
         background-size: 400% 400%;
         animation: GradientBackground 15s ease infinite;
         color: white;
         font-family: 'Inter', sans-serif;
-        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     @keyframes GradientBackground {
@@ -24,12 +32,12 @@
         padding: 40px;
         box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
         margin: 20px;
-        transform: perspective(1000px) rotateX(10deg);  
-        transition: all 0.4s ease;
+        max-width: 1200px;
+        width: 95%;
+        transition: box-shadow 0.4s ease;
     }
 
     .reports-container:hover {
-        transform: perspective(1000px) rotateX(0);  
         box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
     }
 
@@ -55,7 +63,6 @@
 
     .btn-custom:hover {
         background: rgba(255, 255, 255, 0.3);
-        transform: translateY(-3px);
     }
 
     .table {

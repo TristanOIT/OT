@@ -48,8 +48,6 @@
 
         .navbar-toggler:hover {
             background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .navbar-toggler-icon {
@@ -59,12 +57,14 @@
         .nav-item .nav-link {
             color: white !important;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: color 0.3s ease, background-color 0.3s ease;
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
         }
 
         .nav-item .nav-link:hover {
             color: rgba(255, 255, 255, 0.7) !important;
-            transform: translateY(-2px);
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
         .dropdown-menu {
@@ -80,7 +80,16 @@
 
         .dropdown-item:hover {
             background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            color: rgba(255, 255, 255, 0.7) !important;
         }
     </style>
     
@@ -102,13 +111,6 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="{{ url_for('overtime.overtime_form') }}">Submit Overtime</a></li>
-                            {% if current_user.is_admin %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ url_for('admin.manage_users') }}">Manage Users</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('overtime.admin_overtime_approval') }}">Overtime Approvals</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('overtime.admin_reports') }}">Admin Reports</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('overtime.dashboard') }}">Admin Dashboard</a></li>
-                            {% endif %}
                         </ul>
                     </li>
                     {% if current_user.is_admin %}
@@ -118,6 +120,10 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
                             <li><a class="dropdown-item" href="{{ url_for('admin.manage_users') }}">Manage Users</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('overtime.dashboard') }}">Admin Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('overtime.admin_reports') }}">Admin Reports</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('overtime.admin_overtime_approval') }}">Overtime Approvals</a></li>
                         </ul>
                     </li>
                     {% endif %}
