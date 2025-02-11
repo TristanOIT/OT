@@ -17,6 +17,11 @@ overtime_blueprint = Blueprint('overtime', __name__)
 @overtime_blueprint.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard():
+    # Check overtime access
+    if not current_user.has_overtime_access():
+        flash('You do not have permission to access overtime features.', 'danger')
+        return redirect(url_for('index'))
+    
     try:
         # Get user's overtime requests for the last 30 days
         thirty_days_ago = datetime.now().date() - timedelta(days=30)
@@ -52,11 +57,21 @@ def dashboard():
 @overtime_blueprint.route('/overtime', methods=['GET'])
 @login_required
 def overtime_form():
+    # Check overtime access
+    if not current_user.has_overtime_access():
+        flash('You do not have permission to access overtime features.', 'danger')
+        return redirect(url_for('index'))
+    
     return render_template('overtime.html')
 
 @overtime_blueprint.route('/api/overtime/submit', methods=['POST'])
 @login_required
 def submit_overtime():
+    # Check overtime access
+    if not current_user.has_overtime_access():
+        flash('You do not have permission to access overtime features.', 'danger')
+        return redirect(url_for('index'))
+    
     ticket_number = request.form.get('ticket_number')
     time_logged = request.form.get('time_logged')
     client_name = request.form.get('client_name')
@@ -86,6 +101,11 @@ def submit_overtime():
 @overtime_blueprint.route('/admin/overtime/approve', methods=['GET', 'POST'])
 @login_required
 def admin_overtime_approval():
+    # Check overtime access
+    if not current_user.has_overtime_access():
+        flash('You do not have permission to access overtime features.', 'danger')
+        return redirect(url_for('index'))
+    
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('overtime.dashboard'))
@@ -114,6 +134,11 @@ def admin_overtime_approval():
 @overtime_blueprint.route('/overtime/report', methods=['GET'])
 @login_required
 def overtime_report():
+    # Check overtime access
+    if not current_user.has_overtime_access():
+        flash('You do not have permission to access overtime features.', 'danger')
+        return redirect(url_for('index'))
+    
     if not current_user.is_admin:
         flash('Access denied', 'danger')
         return redirect(url_for('overtime.dashboard'))
@@ -143,6 +168,11 @@ def overtime_report():
 @overtime_blueprint.route('/admin/reports', methods=['GET', 'POST'])
 @login_required
 def admin_reports():
+    # Check overtime access
+    if not current_user.has_overtime_access():
+        flash('You do not have permission to access overtime features.', 'danger')
+        return redirect(url_for('index'))
+    
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('overtime.dashboard'))
@@ -194,6 +224,11 @@ def admin_reports():
 @overtime_blueprint.route('/admin/reports/pdf', methods=['POST'])
 @login_required
 def generate_pdf_report():
+    # Check overtime access
+    if not current_user.has_overtime_access():
+        flash('You do not have permission to access overtime features.', 'danger')
+        return redirect(url_for('index'))
+    
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('overtime.dashboard'))
@@ -289,3 +324,100 @@ def generate_pdf_report():
         download_name=f'overtime_report_{start_date}_to_{end_date}.pdf',
         mimetype='application/pdf'
     )
+
+@overtime_blueprint.route('/admin/dashboard', methods=['GET'])
+@login_required
+def admin_overtime_dashboard():
+    """Admin overtime dashboard to view and manage all overtime requests"""
+    # Check admin access
+    if not current_user.is_admin and not current_user.can_access_overtime:
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('main.index'))
+    
+    try:
+        # Get all overtime requests for the last 30 days
+        thirty_days_ago = datetime.now().date() - timedelta(days=30)
+        all_requests = OvertimeRequest.query.filter(
+            OvertimeRequest.date >= thirty_days_ago
+        ).order_by(OvertimeRequest.date.desc()).all()
+        
+        # Aggregate statistics
+        total_requests = len(all_requests)
+        pending_requests = sum(1 for req in all_requests if req.status == 'pending')
+        approved_requests = sum(1 for req in all_requests if req.status == 'approved')
+        rejected_requests = sum(1 for req in all_requests if req.status == 'rejected')
+        total_hours = sum(float(req.time_logged) for req in all_requests)
+        
+        return render_template('admin_overtime_dashboard.html', 
+                               requests=all_requests, 
+                               total_requests=total_requests,
+                               pending_requests=pending_requests,
+                               approved_requests=approved_requests,
+                               rejected_requests=rejected_requests,
+                               total_hours=total_hours)
+    except OperationalError:
+        # If status column is missing, add a default status
+        from sqlalchemy import text
+        db.session.execute(text('ALTER TABLE overtime_request ADD COLUMN status TEXT DEFAULT "pending"'))
+        db.session.commit()
+        
+        # Retry the query
+        all_requests = OvertimeRequest.query.filter(
+            OvertimeRequest.date >= thirty_days_ago
+        ).order_by(OvertimeRequest.date.desc()).all()
+        
+        # Aggregate statistics
+        total_requests = len(all_requests)
+        pending_requests = sum(1 for req in all_requests if req.status == 'pending')
+        approved_requests = sum(1 for req in all_requests if req.status == 'approved')
+        rejected_requests = sum(1 for req in all_requests if req.status == 'rejected')
+        total_hours = sum(float(req.time_logged) for req in all_requests)
+        
+        return render_template('admin_overtime_dashboard.html', 
+                               requests=all_requests, 
+                               total_requests=total_requests,
+                               pending_requests=pending_requests,
+                               approved_requests=approved_requests,
+                               rejected_requests=rejected_requests,
+                               total_hours=total_hours)
+
+@overtime_blueprint.route('/overtime_requests', methods=['GET'])
+@login_required
+def overtime_requests():
+    """View user's overtime requests"""
+    # Check overtime access
+    if not current_user.has_overtime_access():
+        flash('You do not have permission to access overtime features.', 'danger')
+        return redirect(url_for('main.index'))
+    
+    try:
+        # Get user's overtime requests for the last 30 days
+        thirty_days_ago = datetime.now().date() - timedelta(days=30)
+        user_requests = OvertimeRequest.query.filter(
+            OvertimeRequest.manager_name == current_user.username,
+            OvertimeRequest.date >= thirty_days_ago
+        ).order_by(OvertimeRequest.date.desc()).all()
+        
+        # Get total hours logged in the last 30 days
+        total_hours = sum(float(req.time_logged) for req in user_requests)
+        
+        return render_template('overtime_requests.html', 
+                               requests=user_requests, 
+                               total_hours=total_hours)
+    except OperationalError:
+        # If status column is missing, add a default status
+        from sqlalchemy import text
+        db.session.execute(text('ALTER TABLE overtime_request ADD COLUMN status TEXT DEFAULT "pending"'))
+        db.session.commit()
+        
+        # Retry the query
+        user_requests = OvertimeRequest.query.filter(
+            OvertimeRequest.manager_name == current_user.username,
+            OvertimeRequest.date >= thirty_days_ago
+        ).order_by(OvertimeRequest.date.desc()).all()
+        
+        total_hours = sum(float(req.time_logged) for req in user_requests)
+        
+        return render_template('overtime_requests.html', 
+                               requests=user_requests, 
+                               total_hours=total_hours)

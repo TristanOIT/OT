@@ -2,11 +2,175 @@
 
 {% block title %}Login - Overtime Management{% endblock %}
 
+{% block head %}
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        background: linear-gradient(135deg, #50c878, #4a90e2);
+        background-size: 400% 400%;
+        animation: GradientBackground 15s ease infinite;
+        color: white;
+        font-family: 'Inter', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    @keyframes GradientBackground {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .login-wrapper {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .login-container {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(15px);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+        max-width: 450px;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+    }
+
+    .login-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05), transparent);
+        transform: rotate(-45deg);
+        animation: shine 5s infinite;
+    }
+
+    @keyframes shine {
+        0% { transform: rotate(-45deg) translateX(-100%); }
+        100% { transform: rotate(-45deg) translateX(100%); }
+    }
+
+    .login-container:hover {
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
+    }
+
+    .login-title {
+        text-align: center;
+        color: white;
+        margin-bottom: 20px;
+        font-weight: 700;
+        font-size: 2.2rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .login-subtitle {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 30px;
+        font-size: 1rem;
+    }
+
+    .form-control {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid transparent;
+        color: white;
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+        padding: 12px;
+    }
+
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .btn-login {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        transition: all 0.3s ease;
+        width: 100%;
+        padding: 12px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .btn-login:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-login:active {
+        transform: translateY(1px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    ::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .login-extras {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+        font-size: 0.9rem;
+    }
+
+    .login-extras a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .login-extras a:hover {
+        color: white;
+        text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+        .login-container {
+            max-width: 95%;
+            padding: 20px;
+        }
+
+        .login-title {
+            font-size: 1.8rem;
+        }
+
+        .login-subtitle {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="login-container">
-    <div class="card">
-        <h1>Overtime Management</h1>
-        <p>Streamline Your Workforce Productivity</p>
+<div class="login-wrapper">
+    <div class="login-container">
+        <h2 class="login-title">Overtime Management</h2>
+        <p class="login-subtitle">Secure Access to Workforce Productivity</p>
         
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -19,17 +183,45 @@
             {% endif %}
         {% endwith %}
         
-        <form method="POST" action="{{ url_for('auth.login') }}">
-            <div class="form-group">
-                <input type="text" class="form-control" name="username" placeholder="Username" required autofocus>
+        <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm">
+            <input type="text" class="form-control" name="username" placeholder="Username" required autofocus autocomplete="username">
+            <input type="password" class="form-control" name="password" placeholder="Password" required autocomplete="current-password">
+            
+            <button type="submit" class="btn btn-login mt-3">Sign In</button>
+            
+            <div class="login-extras">
+                <a href="#" onclick="forgotPassword()">Forgot Password?</a>
+                <a href="#" onclick="contactSupport()">Need Help?</a>
             </div>
-            <div class="form-group">
-                <input type="password" class="form-control" name="password" placeholder="Password" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Sign In</button>
         </form>
     </div>
 </div>
+
+<script>
+    function forgotPassword() {
+        alert('Please contact your system administrator to reset your password.');
+    }
+
+    function contactSupport() {
+        alert('For support, please email: support@overtimemanagement.com');
+    }
+
+    // Optional: Add form validation
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        const username = this.querySelector('input[name="username"]');
+        const password = this.querySelector('input[name="password"]');
+        
+        if (username.value.trim() === '') {
+            alert('Please enter your username');
+            event.preventDefault();
+        }
+        
+        if (password.value.trim() === '') {
+            alert('Please enter your password');
+            event.preventDefault();
+        }
+    });
+</script>
 {% endblock %}
 
 {% block scripts %}

@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+    body {
+        background: linear-gradient(135deg, #50c878, #4a90e2);
+        background-size: 400% 400%;
+        animation: GradientBackground 15s ease infinite;
+        color: white;
+        font-family: 'Inter', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @keyframes GradientBackground {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .stock-container {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+        max-width: 1200px;
+        width: 95%;
+        transition: box-shadow 0.4s ease;
+    }
+
+    .stock-container:hover {
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
+    }
+
+    .table {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .table thead {
+        background-color: #4a90e2;
+        color: white;
+    }
+
+    .low-stock {
+        background-color: rgba(231, 76, 60, 0.2) !important;
+    }
+
+    .summary-card {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stock-container">
+    <h2 class="text-center mb-4">Stock Reports</h2>
+    
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="summary-card text-center">
+                <h4>Total Stock Value</h4>
+                <h2>${{ "%.2f"|format(total_stock_value) }}</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="summary-card text-center">
+                <h4>Low Stock Items</h4>
+                <h2>{{ low_stock_items|length }}</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="summary-card text-center">
+                <h4>Total Unique Items</h4>
+                <h2>{{ low_stock_items|length + (low_stock_items|length == 0)|int }}</h2>
+            </div>
+        </div>
+    </div>
+
+    {% if low_stock_items %}
+    <div class="mb-4">
+        <h3>Low Stock Alert</h3>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Current Quantity</th>
+                    <th>Minimum Level</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in low_stock_items %}
+                <tr class="low-stock">
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.category }}</td>
+                    <td>{{ item.total_quantity }} {{ item.unit_of_measurement }}</td>
+                    <td>{{ item.minimum_stock_level }} {{ item.unit_of_measurement }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <div>
+        <h3>Recent Stock Movements</h3>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Movement Type</th>
+                    <th>Quantity</th>
+                    <th>Description</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for movement in recent_movements %}
+                <tr>
+                    <td>{{ movement.stock_item.name }}</td>
+                    <td>{{ movement.movement_type|capitalize }}</td>
+                    <td>{{ movement.quantity }} {{ movement.stock_item.unit_of_measurement }}</td>
+                    <td>{{ movement.description or 'No description' }}</td>
+                    <td>{{ movement.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

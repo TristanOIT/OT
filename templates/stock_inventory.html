@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+    body {
+        background: linear-gradient(135deg, #50c878, #4a90e2);
+        background-size: 400% 400%;
+        animation: GradientBackground 15s ease infinite;
+        color: white;
+        font-family: 'Inter', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @keyframes GradientBackground {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .stock-container {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+        max-width: 1200px;
+        width: 95%;
+        transition: box-shadow 0.4s ease;
+    }
+
+    .stock-container:hover {
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
+    }
+
+    .table {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .table thead {
+        background-color: #4a90e2;
+        color: white;
+    }
+
+    .low-stock {
+        background-color: rgba(231, 76, 60, 0.2) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stock-container">
+    <h2 class="text-center mb-4">Stock Inventory</h2>
+    
+    {% if low_stock_items %}
+    <div class="alert alert-warning">
+        <strong>Low Stock Alert!</strong> The following items are below their minimum stock level:
+        <ul>
+            {% for item in low_stock_items %}
+            <li>{{ item.name }} (Current: {{ item.total_quantity }} {{ item.unit_of_measurement }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Quantity</th>
+                    <th>Unit</th>
+                    <th>Unit Price</th>
+                    <th>Total Value</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in stock_items %}
+                <tr class="{{ 'low-stock' if item.is_low_stock() else '' }}">
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.category }}</td>
+                    <td>{{ item.total_quantity }}</td>
+                    <td>{{ item.unit_of_measurement }}</td>
+                    <td>${{ "%.2f"|format(item.unit_price) }}</td>
+                    <td>${{ "%.2f"|format(item.total_value) }}</td>
+                    <td>
+                        <a href="{{ url_for('stock.stock_item_details', item_id=item.id) }}" class="btn btn-sm btn-info">Details</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+    body {
+        background: linear-gradient(135deg, #50c878, #4a90e2);
+        background-size: 400% 400%;
+        animation: GradientBackground 15s ease infinite;
+        color: white;
+        font-family: 'Inter', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @keyframes GradientBackground {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .user-form-container {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+        max-width: 500px;
+        width: 95%;
+        transition: box-shadow 0.4s ease;
+    }
+
+    .user-form-container:hover {
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
+    }
+
+    .form-check-input {
+        background-color: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .form-check-input:checked {
+        background-color: #4a90e2;
+        border-color: #4a90e2;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="user-form-container">
+        <h2 class="mb-4 text-center">Edit User: {{ user.username }}</h2>
+        <form method="POST">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" value="{{ user.username }}" readonly>
+            </div>
+            
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="new_password" class="form-label">New Password (optional)</label>
+                <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Leave blank to keep current password">
+            </div>
+            
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="is_admin" name="is_admin" 
+                       {% if user.is_admin %}checked{% endif %}>
+                <label class="form-check-label" for="is_admin">Admin Access</label>
+            </div>
+            
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="can_access_overtime" name="can_access_overtime"
+                       {% if user.can_access_overtime %}checked{% endif %}>
+                <label class="form-check-label" for="can_access_overtime">Overtime Access</label>
+            </div>
+            
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="can_access_inventory" name="can_access_inventory"
+                       {% if user.can_access_inventory %}checked{% endif %}>
+                <label class="form-check-label" for="can_access_inventory">Inventory Access</label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100">Update User</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

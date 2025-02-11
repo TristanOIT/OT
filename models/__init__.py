@@ -1,1 +1,4 @@
-# This file can remain empty or import models if needed.
+# Import all models to ensure they are registered with SQLAlchemy
+from .user import User
+from .overtime import OvertimeRequest
+from .stock import StockItem, StockMovement

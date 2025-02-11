@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Overtime Management Dashboard</h1>
+            
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card text-white bg-primary mb-3">
+                        <div class="card-header">Total Requests</div>
+                        <div class="card-body">
+                            <h2 class="card-title">{{ total_requests }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-warning mb-3">
+                        <div class="card-header">Pending Requests</div>
+                        <div class="card-body">
+                            <h2 class="card-title">{{ pending_requests }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-success mb-3">
+                        <div class="card-header">Approved Requests</div>
+                        <div class="card-body">
+                            <h2 class="card-title">{{ approved_requests }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-danger mb-3">
+                        <div class="card-header">Rejected Requests</div>
+                        <div class="card-body">
+                            <h2 class="card-title">{{ rejected_requests }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    Overtime Requests (Last 30 Days)
+                    <span class="float-end">Total Hours: {{ total_hours }} hrs</span>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Manager</th>
+                                <th>Time Logged</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in requests %}
+                            <tr>
+                                <td>{{ request.date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ request.manager_name }}</td>
+                                <td>{{ request.time_logged }} hrs</td>
+                                <td>{{ request.description }}</td>
+                                <td>
+                                    {% if request.status == 'approved' %}
+                                    <span class="badge bg-success">Approved</span>
+                                    {% elif request.status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="#" class="btn btn-sm btn-success">Approve</a>
+                                        <a href="#" class="btn btn-sm btn-danger">Reject</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
