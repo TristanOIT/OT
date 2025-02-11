@@ -1,5 +1,82 @@
+/* General Page Styling */
 body {
-  padding-top: 60px;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  color: #fff;
+  font-family: 'Arial', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
 }
 
-/* Additional custom styles can be added here */
+/* Centered Card for Login */
+.card {
+  background: rgba(255, 255, 255, 0.1); /* Semi-transparent */
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 350px;
+}
+
+/* Headings */
+h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+/* Paragraph */
+p {
+  font-size: 14px;
+  margin-bottom: 20px;
+  color: #ddd;
+}
+
+/* Form Inputs */
+.form-control {
+  border-radius: 5px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Futuristic Login Button */
+.btn-primary {
+  background: linear-gradient(45deg, #00c6ff, #0072ff);
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  width: 100%;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(45deg, #0072ff, #00c6ff);
+  box-shadow: 0 0 10px #00c6ff;
+}
+
+/* Input Fields and Button Container */
+.form-group {
+  margin-bottom: 15px;
+}
+
+/* Responsive */
+@media (max-width: 400px) {
+  .card {
+    width: 90%;
+  }
+}

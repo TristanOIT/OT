@@ -1,17 +1,50 @@
 {% extends "base.html" %}
+
+{% block title %}Login - Overtime Management{% endblock %}
+
 {% block content %}
-<div class="container">
-  <h2>Login</h2>
-  <form method="POST">
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input type="text" class="form-control" name="username" id="username" required>
+<div class="login-container">
+    <div class="card">
+        <h1>Overtime Management</h1>
+        <p>Streamline Your Workforce Productivity</p>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            <div class="form-group">
+                <input type="text" class="form-control" name="username" placeholder="Username" required autofocus>
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" name="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Sign In</button>
+        </form>
     </div>
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input type="password" class="form-control" name="password" id="password" required>
-    </div>
-    <button type="submit" class="btn btn-primary">Login</button>
-  </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            const closeButton = alert.querySelector('.btn-close');
+            if (closeButton) {
+                closeButton.addEventListener('click', function() {
+                    alert.classList.remove('show');
+                    alert.classList.add('d-none');
+                });
+            }
+        });
+    });
+</script>
 {% endblock %}

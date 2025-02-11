@@ -1,21 +1,107 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Home - Overtime Management{% endblock %}
+
+{% block head %}
+<style>
+    body {
+        background: linear-gradient(135deg, #50c878, #4a90e2);
+        background-size: 400% 400%;
+        animation: GradientBackground 15s ease infinite;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        font-family: 'Inter', sans-serif;
+    }
+
+    @keyframes GradientBackground {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .home-container {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 60px 40px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+        max-width: 700px;
+        width: 90%;
+        transform: perspective(1000px) rotateX(10deg);
+        transition: all 0.4s ease;
+    }
+
+    .home-container:hover {
+        transform: perspective(1000px) rotateX(0);
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
+    }
+
+    .home-title {
+        font-size: 3em;
+        margin-bottom: 20px;
+        font-weight: 700;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .home-subtitle {
+        font-size: 1.5em;
+        margin-bottom: 30px;
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.6;
+    }
+
+    .login-btn {
+        display: inline-block;
+        padding: 15px 40px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-size: 1.2em;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .login-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: all 0.3s ease;
+    }
+
+    .login-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .login-btn:hover::before {
+        left: 100%;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="text-align: center; padding: 50px;">
-  <h1 style="font-size: 3em; margin-bottom: 20px;">Welcome to the Future</h1>
-  <p style="font-size: 1.5em; margin-bottom: 30px;">
-    Enjoy the advanced Overtime and Stock Management Portal built for tomorrow's needs.
-  </p>
-  <a href="/login" style="
-      padding: 15px 30px;
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-      text-decoration: none;
-      border-radius: 5px;
-      font-size: 1.2em;
-      transition: background 0.3s ease;
-    " onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
-    Login
-  </a>
+<div class="home-container">
+    <h1 class="home-title">Welcome to the Future</h1>
+    <p class="home-subtitle">
+        Revolutionizing Workforce Management with Advanced Overtime and Stock Tracking
+    </p>
+    <a href="/login" class="login-btn">
+        Get Started
+    </a>
 </div>
 {% endblock %}
