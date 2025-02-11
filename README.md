@@ -39,7 +39,7 @@ cd overtime-management
 ### 2. Create Virtual Environment
 ```bash
 python -m venv venv
-source venv/Scripts/activate  # On Windows
+venv\Scripts\activate
 ```
 
 ### 3. Install Dependencies
