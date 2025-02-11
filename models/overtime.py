@@ -9,6 +9,7 @@ class OvertimeRequest(db.Model):
     manager_name = db.Column(db.String(100), nullable=False)
     date = db.Column(db.Date, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(20), default='pending')  # New field: pending, approved, denied
 
     def to_dict(self):
         return {
@@ -17,5 +18,6 @@ class OvertimeRequest(db.Model):
             "client_name": self.client_name,
             "manager_name": self.manager_name,
             "date": self.date.isoformat(),
-            "created_at": self.created_at.isoformat()
+            "created_at": self.created_at.isoformat(),
+            "status": self.status
         }

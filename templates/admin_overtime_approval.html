@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+    body {
+        background: linear-gradient(135deg, #50c878, #4a90e2);
+        background-size: 400% 400%;
+        animation: GradientBackground 15s ease infinite;
+        color: white;
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @keyframes GradientBackground {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .admin-container {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+        max-width: 1200px;
+        width: 95%;
+        transform: perspective(1000px) rotateX(10deg);
+        transition: all 0.4s ease;
+    }
+
+    .admin-container:hover {
+        transform: perspective(1000px) rotateX(0);
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
+    }
+
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .admin-title {
+        color: white;
+        font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .table {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .table thead {
+        background: rgba(74, 144, 226, 0.2);
+        color: white;
+    }
+
+    .btn-approve, .btn-deny {
+        margin-right: 5px;
+        padding: 5px 10px;
+        font-size: 0.8em;
+    }
+
+    .btn-approve {
+        background-color: rgba(46, 204, 113, 0.7);
+        border-color: rgba(46, 204, 113, 0.7);
+    }
+
+    .btn-deny {
+        background-color: rgba(231, 76, 60, 0.7);
+        border-color: rgba(231, 76, 60, 0.7);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1 class="admin-title">Overtime Approval</h1>
+        <a href="{{ url_for('overtime.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    {% if requests %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Ticket Number</th>
+                <th>Manager</th>
+                <th>Client Name</th>
+                <th>Hours Logged</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in requests %}
+            <tr>
+                <td>{{ request.date }}</td>
+                <td>{{ request.ticket_number }}</td>
+                <td>{{ request.manager_name }}</td>
+                <td>{{ request.client_name }}</td>
+                <td>{{ request.time_logged }}</td>
+                <td>
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="request_id" value="{{ request.id }}">
+                        <button type="submit" name="action" value="approve" class="btn btn-approve">Approve</button>
+                        <button type="submit" name="action" value="deny" class="btn btn-deny">Deny</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-info text-center">
+        No pending overtime requests.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

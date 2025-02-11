@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+    .form-container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 500px;
+        margin: 0 auto;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-control {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: white;
+    }
+
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        box-shadow: none;
+    }
+
+    .form-check-input {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-submit {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-3px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="form-container">
+                <h2 class="text-white text-center mb-4">Edit User</h2>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label text-white">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label text-white">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label text-white">New Password (leave blank to keep current password)</label>
+                        <input type="password" class="form-control" id="password" name="password">
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="is_admin" name="is_admin" {% if user.is_admin %}checked{% endif %}>
+                        <label class="form-check-label text-white" for="is_admin">Admin User</label>
+                    </div>
+                    <button type="submit" class="btn btn-submit w-100">Update User</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

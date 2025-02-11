@@ -1,0 +1,28 @@
+/* Global Card Styling */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    transform: none !important;
+    perspective: none !important;
+}
+
+.card:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+    transform: translateY(-10px) !important;
+}
+
+/* Prevent any unintended perspective or rotation */
+.card * {
+    transform: none !important;
+    perspective: none !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .card:hover {
+        transform: none !important;
+    }
+}

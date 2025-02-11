@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+    body {
+        background: linear-gradient(135deg, #50c878, #4a90e2);
+        background-size: 400% 400%;
+        animation: GradientBackground 15s ease infinite;
+        color: white;
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @keyframes GradientBackground {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .dashboard-container {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+        max-width: 1000px;
+        width: 95%;
+        transition: all 0.4s ease;
+    }
+
+    .dashboard-container:hover {
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .dashboard-title {
+        color: white;
+        font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .dashboard-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        width: 30%;
+    }
+
+    .table {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .table thead {
+        background: rgba(74, 144, 226, 0.2);
+        color: white;
+    }
+
+    .btn-primary, .btn-secondary {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover, .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Welcome, {{ current_user.username }}</h1>
+        <div>
+            <a href="{{ url_for('overtime.overtime_form') }}" class="btn btn-primary me-2">Submit Overtime</a>
+            {% if current_user.is_admin %}
+            <a href="{{ url_for('overtime.admin_overtime_approval') }}" class="btn btn-secondary">Admin Approval</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <h4>Total Hours</h4>
+            <h2>{{ total_hours }}</h2>
+        </div>
+        <div class="stat-card">
+            <h4>Pending Requests</h4>
+            <h2>{{ requests|selectattr('status', 'equalto', 'pending')|list|length }}</h2>
+        </div>
+        <div class="stat-card">
+            <h4>Approved Requests</h4>
+            <h2>{{ requests|selectattr('status', 'equalto', 'approved')|list|length }}</h2>
+        </div>
+    </div>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Ticket Number</th>
+                <th>Client Name</th>
+                <th>Hours Logged</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in requests %}
+            <tr>
+                <td>{{ request.date }}</td>
+                <td>{{ request.ticket_number }}</td>
+                <td>{{ request.client_name }}</td>
+                <td>{{ request.time_logged }}</td>
+                <td>
+                    {% if request.status == 'pending' %}
+                        <span class="badge bg-warning">Pending</span>
+                    {% elif request.status == 'approved' %}
+                        <span class="badge bg-success">Approved</span>
+                    {% else %}
+                        <span class="badge bg-danger">Denied</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
