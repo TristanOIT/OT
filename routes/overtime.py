@@ -7,9 +7,9 @@ from datetime import datetime, timedelta
 from sqlalchemy.exc import OperationalError
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 
 # Rename blueprint to avoid potential conflicts
 overtime_blueprint = Blueprint('overtime', __name__)
@@ -171,25 +171,35 @@ def admin_reports():
     # Check overtime access
     if not current_user.has_overtime_access():
         flash('You do not have permission to access overtime features.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('overtime.dashboard'))
     
-    # Default to last 30 days if no filters provided
+    # Get all users for the dropdown
+    users = User.query.all()
+    
+    # Default date range
     end_date = datetime.now().date()
     start_date = end_date - timedelta(days=30)
     
-    if request.method == 'POST':
-        start_date_str = request.form.get('start_date')
-        end_date_str = request.form.get('end_date')
-        
-        try:
-            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date() if start_date_str else start_date
-            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date() if end_date_str else end_date
-        except ValueError:
-            flash('Invalid date format', 'danger')
+    # Get filter parameters
+    form_start_date = request.form.get('start_date')
+    form_end_date = request.form.get('end_date')
+    status = request.form.get('status', 'all')
+    manager_name = request.form.get('manager_name', '')
+    client_name = request.form.get('client_name', '')
+    selected_user_id = request.form.get('user_id', '')
+    
+    # Parse dates
+    try:
+        if form_start_date:
+            start_date = datetime.strptime(form_start_date, '%Y-%m-%d').date()
+        if form_end_date:
+            end_date = datetime.strptime(form_end_date, '%Y-%m-%d').date()
+    except ValueError:
+        flash('Invalid date format', 'danger')
     
     # Filter requests
     query = OvertimeRequest.query.filter(
@@ -197,29 +207,39 @@ def admin_reports():
     )
     
     # Additional filters
-    status = request.form.get('status')
     if status and status != 'all':
         query = query.filter(OvertimeRequest.status == status)
     
-    manager_name = request.form.get('manager_name')
     if manager_name:
         query = query.filter(OvertimeRequest.manager_name.ilike(f"%{manager_name}%"))
     
-    client_name = request.form.get('client_name')
     if client_name:
         query = query.filter(OvertimeRequest.client_name.ilike(f"%{client_name}%"))
     
+    # Filter by selected user
+    if selected_user_id:
+        selected_user = User.query.get(selected_user_id)
+        if selected_user:
+            query = query.filter(OvertimeRequest.user_id == selected_user_id)
+    
     # Execute query
-    overtime_requests = query.order_by(OvertimeRequest.date.desc()).all()
+    requests = query.order_by(OvertimeRequest.date.desc()).all()
     
     # Calculate total hours
-    total_hours = sum(float(req.time_logged) for req in overtime_requests)
+    total_hours = sum(float(req.time_logged) for req in requests)
     
-    return render_template('admin_reports.html', 
-                           requests=overtime_requests, 
-                           total_hours=total_hours,
-                           start_date=start_date,
-                           end_date=end_date)
+    return render_template(
+        'admin_reports.html', 
+        requests=requests, 
+        start_date=start_date, 
+        end_date=end_date, 
+        status=status, 
+        manager_name=manager_name, 
+        client_name=client_name,
+        users=users,
+        selected_user_id=selected_user_id,
+        total_hours=total_hours
+    )
 
 @overtime_blueprint.route('/admin/reports/pdf', methods=['POST'])
 @login_required
@@ -239,6 +259,7 @@ def generate_pdf_report():
     status = request.form.get('status', 'all')
     manager_name = request.form.get('manager_name', '')
     client_name = request.form.get('client_name', '')
+    selected_user_id = request.form.get('user_id', '')
     
     # Parse dates
     try:
@@ -263,8 +284,17 @@ def generate_pdf_report():
     if client_name:
         query = query.filter(OvertimeRequest.client_name.ilike(f"%{client_name}%"))
     
+    # Filter by selected user
+    if selected_user_id:
+        selected_user = User.query.get(selected_user_id)
+        if selected_user:
+            query = query.filter(OvertimeRequest.user_id == selected_user_id)
+    
     # Execute query
     overtime_requests = query.order_by(OvertimeRequest.date.desc()).all()
+    
+    # Calculate total hours
+    total_hours = sum(float(req.time_logged) for req in overtime_requests)
     
     # Create PDF
     buffer = BytesIO()
@@ -276,7 +306,6 @@ def generate_pdf_report():
         ['Date', 'Ticket Number', 'Manager', 'Client', 'Hours', 'Status']
     ]
     
-    total_hours = 0
     for req in overtime_requests:
         table_data.append([
             req.date.strftime('%Y-%m-%d'),
@@ -286,7 +315,6 @@ def generate_pdf_report():
             req.time_logged,
             req.status
         ])
-        total_hours += float(req.time_logged)
     
     # Add total hours row
     table_data.append([
@@ -310,7 +338,17 @@ def generate_pdf_report():
     
     # Title and subtitle
     title = Paragraph(f"Overtime Report", styles['Title'])
-    subtitle = Paragraph(f"From {start_date} to {end_date}", styles['Subtitle'])
+    
+    # Create a custom subtitle style
+    subtitle_style = ParagraphStyle(
+        'CustomSubtitle',
+        parent=styles['Normal'],
+        fontSize=10,
+        textColor=colors.darkgrey,
+        alignment=1,  # Center alignment
+        spaceAfter=12
+    )
+    subtitle = Paragraph(f"From {start_date} to {end_date}", subtitle_style)
     
     # Build PDF
     elements = [title, subtitle, table]

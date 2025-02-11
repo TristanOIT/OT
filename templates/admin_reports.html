@@ -102,22 +102,37 @@
                 </select>
             </div>
             <div class="col-md-2">
+                <label for="user_id" class="form-label text-white">User</label>
+                <select class="form-select" id="user_id" name="user_id">
+                    <option value="">All Users</option>
+                    {% for user in users %}
+                    <option value="{{ user.id }}" {% if user.id == selected_user_id %}selected{% endif %}>
+                        {{ user.username }} ({{ user.email }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
                 <label for="manager_name" class="form-label text-white">Manager</label>
-                <input type="text" class="form-control" id="manager_name" name="manager_name" placeholder="Manager Name">
+                <input type="text" class="form-control" id="manager_name" name="manager_name" placeholder="Manager Name" value="{{ manager_name }}">
             </div>
             <div class="col-md-2">
                 <label for="client_name" class="form-label text-white">Client</label>
-                <input type="text" class="form-control" id="client_name" name="client_name" placeholder="Client Name">
+                <input type="text" class="form-control" id="client_name" name="client_name" placeholder="Client Name" value="{{ client_name }}">
             </div>
             <div class="col-12 d-flex justify-content-between mt-3">
                 <button type="submit" class="btn btn-custom">Filter Reports</button>
-                <form method="POST" action="{{ url_for('overtime.generate_pdf_report') }}" class="d-inline">
-                    <input type="hidden" name="start_date" value="{{ start_date.strftime('%Y-%m-%d') }}">
-                    <input type="hidden" name="end_date" value="{{ end_date.strftime('%Y-%m-%d') }}">
-                    <input type="hidden" name="status" value="all">
-                    <button type="submit" class="btn btn-custom">Generate PDF Report</button>
-                </form>
             </div>
+        </form>
+
+        <form method="POST" action="{{ url_for('overtime.generate_pdf_report') }}" class="d-inline">
+            <input type="hidden" name="start_date" value="{{ start_date.strftime('%Y-%m-%d') }}">
+            <input type="hidden" name="end_date" value="{{ end_date.strftime('%Y-%m-%d') }}">
+            <input type="hidden" name="status" value="{{ status }}">
+            <input type="hidden" name="user_id" value="{{ user_id }}">
+            <input type="hidden" name="manager_name" value="{{ manager_name }}">
+            <input type="hidden" name="client_name" value="{{ client_name }}">
+            <button type="submit" class="btn btn-custom">Generate PDF Report</button>
         </form>
     </div>
 
@@ -156,9 +171,9 @@
                 {% endfor %}
             </tbody>
             <tfoot>
-                <tr class="table-active">
-                    <td colspan="4"><strong>Total Hours</strong></td>
-                    <td colspan="2"><strong>{{ total_hours|round(2) }}</strong></td>
+                <tr>
+                    <td colspan="4" class="text-right"><strong>Total Hours:</strong></td>
+                    <td colspan="2"><strong>{{ total_hours|default(0)|round(2) }}</strong></td>
                 </tr>
             </tfoot>
         </table>
